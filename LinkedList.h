@@ -1,10 +1,9 @@
-#pragma once
-#ifndef _LINKEDLIST_H_
-#define	_LINKEDLIST_H_
+#ifndef LINKEDLIST_H
+#define	LINKEDLIST_H
 #include<iostream>
 #include<iterator>
 
-
+//Forward declaration because I will use the list class in the node class.
 template<typename T> class LinkedList;
 
 ///*******Node class*******///
@@ -18,68 +17,192 @@ private:
 	ListNode<T>* next;
 };
 
-
 template <typename T>
 class LinkedList
 {
+private:
+	ListNode<T>* head;		//keeps track of the first element of the list
+	ListNode<T>* tail;		//keeps traks of the last element in the list
+	unsigned int length;	//length of the list
+
 public:
-	
 	////*********Iterator Class*********////
 	class ListIterator : public std::iterator<std::forward_iterator_tag, T>
 	{
 	public:
-		ListIterator():currPos(NULL) {};
-		//operators
+		ListIterator():currPos(NULL) {};		
+		//operators//
 		void operator++() {currPos = currPos->next;};
 		void operator++(int) {currPos = currPos->next;};
-		bool operator!=(ListIterator rval){ return (currPos != rval.currPos); }
-		bool operator==(ListIterator rval){ return (currPos == rval.currPos); }
+		bool operator!=(ListIterator rval) { return (currPos != rval.currPos); }
+		bool operator==(ListIterator rval) { return (currPos == rval.currPos); }
 		T operator*() {return currPos->next->data;};
 		T* operator->() {return &(currPos->next->data);};
-		ListIterator& operator=(ListIterator& rval)
-		{
-			if (this->currPos == rval.currPos)
-				return *this;
+		ListIterator& operator=(ListIterator& rval){
+			if (this->currPos == rval.currPos) return *this;
 			this->currPos = rval.currPos;
 			return *this;
 		};
-
 	private:
 		ListNode<T>* currPos;
 		friend class LinkedList<T>;
+		//This constructor is private so that users only access the default constructor
 		ListIterator(ListNode<T>* value):currPos(value) {};
 	};
+	////*********END*********////
+	
+	LinkedList(void); //Constructor
+	~LinkedList(void) {DeleteList(); delete head;}; //Destructor
+
+	//*** List Manipulation Methods ***//
+
+	//Removes the element that is pointed to by the iterator
+	void Remove(const ListIterator& it);
+	//inserts an element after our position, returns false if it fails
+	bool InsertAfter(const ListIterator& it, const T& data);
+	//inserts an element before our current position, returns false if it fails
+	void InsertBefore(const ListIterator& it, const T& data);
+	//remove first element of the list
+	void DeleteHead(void);
+	//deletes the entire list
+	void DeleteList(void);
+	//Add an element to the front of the list, returns false if it fails
+	bool PushFront(const T& data);
+	//Add an element to the back of the list, returns false if it fails
+	bool PushBack(const T& data);
+
+	//********Accessors********//
+
+	unsigned int GetLength(void) {return length;};
+	bool IsEmpty(void) { return (length == 0); };
+	T FirstElement(void) {return head->next->data;};
+
+	//** Get relevant positions **//
+
+	ListIterator begin(void) {return ListIterator(head); };
+	ListIterator end(void) {return ListIterator(tail); };
+
+};
+
+//Merge function that the merge sort algorithm will use to merge two linked lists
+template<typename T>
+LinkedList<T> Merge(LinkedList<T> left, LinkedList<T> right )
+{
+	LinkedList<T>::ListIterator leftIt = left.begin();
+	LinkedList<T>::ListIterator rightIt = right.begin();
+	LinkedList<T> sortedList;
+
+	while (!left.IsEmpty() && !right.IsEmpty()){
+		
+		if(*leftIt >= *rightIt){
+
+			sortedList.PushBack(*rightIt);
+			right.DeleteHead();
+			rightIt = right.begin();
+
+		}else if (*leftIt <= *rightIt){
+
+			sortedList.PushBack(*leftIt);
+			left.DeleteHead();
+			leftIt = left.begin();
+		}
+	}
+
+	if(left.IsEmpty()){
+
+		while(!right.IsEmpty()){
+
+			sortedList.PushBack(*rightIt);
+			right.DeleteHead();
+			rightIt = right.begin();
+		}
+
+	}else if(right.IsEmpty()){
+
+		while(!left.IsEmpty()){
+
+			sortedList.PushBack(*leftIt);
+			left.DeleteHead();
+			leftIt = left.begin();
+		}
+	}
+
+	
+	return sortedList;
+}
+
+//The MergeSort function recusivly partitions the linked lists and then merges them by calling the merge() function
+template<typename T>
+LinkedList<T> MergeSort (LinkedList<T> list)
+{
+	if (list.GetLength() == 1)
+		return list;
+	
+	LinkedList<T> left, right, sorted;
+	LinkedList<T>::ListIterator it = list.begin();
+
+	unsigned int midPoint = list.GetLength()/2;	//if length is odd, midPoint will be the floor of the division
+
+	for(unsigned int i=0; i < midPoint; ++i){
+	
+		left.PushBack(*it);
+		list.DeleteHead();
+		it = list.begin();
+	}
 
 
-	//Destructor & constructor... pretty basic stuff
-	LinkedList(void): length(0)
+	while (list.GetLength() != 0){
+
+		right.PushBack(*it);
+		list.DeleteHead();
+		it = list.begin();
+
+	}
+
+	left = MergeSort(left);
+    right = MergeSort(right);
+	
+	return Merge(left, right);
+
+}
+
+
+template<typename T>
+LinkedList<T>::LinkedList(void): length(0)
 	{
 		try{
 			head = new ListNode<T>;
 			tail = head;
-			head->next = NULL;
+			tail->next = NULL;
 		}catch(bad_alloc& exc){
-			cout<<"Memory allocation failed";
+			cerr<<"Memory allocation failed, cannot initialize the linked list.";
 		}
-	};
-	~LinkedList(void) {DeleteList(); delete head;};
+	}
 
+template<typename T>
+void LinkedList<T>::Remove(const ListIterator& it)
+{
+	if (!IsEmpty() && length > 1){
+		ListNode<T>* temp = NULL;
+		temp = it.currPos->next;
+		it.currPos->next = it.currPos->next->next;
+		delete temp;
+		temp=NULL;
+		--length;
+	}else if (length == 1){
 
-	//*** List Manipulation Methods ***//
-	//Removes the element that is pointed to by the iterator
-	void Remove(const ListIterator& it)
-	{
-		if (!IsEmpty()){
-			ListNode<T>* temp = NULL;
-			temp = it.currPos->next;
-			it.currPos->next = it.currPos->next->next;
-			delete temp;
-			--length;
-		}
-	};
+		ListNode<T>* temp = NULL;
+		temp = it.currPos->next;
+		it.currPos->next = it.currPos->next->next;
+		tail=head;
+		delete temp;
+		temp=NULL;
+		--length;	
+	}
+}
 
-	//inserts an element after our position, returns false if it fails
-	bool InsertAfter(const ListIterator& it, const T& data)
+template<typename T>
+bool LinkedList<T>::InsertAfter(const ListIterator& it, const T& data)
 	{
 		if (!IsEmpty()){
 			try {
@@ -95,10 +218,10 @@ public:
 			}
 		}else
 			return;
-	};
+	}
 
-	//inserts an element before our current position, returns false if it fails
-	void InsertBefore(const ListIterator& it, const T& data)
+template<typename T>
+void LinkedList<T>::InsertBefore(const ListIterator& it, const T& data)
 	{
 		if (!IsEmpty()){
 			try {
@@ -113,24 +236,36 @@ public:
 			}else
 				return;
 		}
-	};
+}
 
-	//deletes the entire list
-	void DeleteList(void)
+template<typename T>
+void LinkedList<T>::DeleteHead(void)
 	{
-		ListNode<T>* temp;
-		while(head->next != NULL)
-		{
-			temp = head;
-			head = head->next;
+		if(length > 1){
+			ListNode<T>* temp;
+			temp = head->next;
+			head->next = head->next->next;
 			delete temp;
 			--length;
+		}else if (length == 1){
+			ListNode<T>* temp;
+			temp = head->next;
+			head->next = head->next->next;
+			tail=head;
+			delete temp;
+			--length;		
 		}
-	};
+	}
 
+template<typename T>
+void LinkedList<T>::DeleteList(void)
+	{
+		while(head->next != NULL)
+			DeleteHead();
+	}
 
-	//Add an element to the front of the list, returns false if it fails
-	bool PushFront(const T& data)
+template<typename T>
+bool LinkedList<T>::PushFront(const T& data)
 	{
 		try {
 			ListNode<T>* newNode = new ListNode<T>;
@@ -147,10 +282,10 @@ public:
 		}catch(bad_alloc& exc){
 				return false;
 			}
-	};
+	}
 
-	//Add an element to the back of the list, returns false if it fails
-	bool PushBack(const T& data)
+template <typename T>
+bool LinkedList<T>::PushBack(const T& data)
 	{
 		try {
 			ListNode<T>* newNode = new ListNode<T>;
@@ -170,22 +305,6 @@ public:
 		}catch(bad_alloc& exc){
 				return false;
 			}
-	};
+	}
 
-	//********Accessors********//
-	unsigned int GetLength(void) {return length;};
-	bool IsEmpty(void) { return (length == 0); };
-	T FirstElement() {return head->next->data;};
-
-	//** Get relevant positions **//
-	ListIterator begin(void) {return ListIterator(head); };
-	ListIterator end(void) {return ListIterator(tail); };
-
-private:
-
-	ListNode<T>* head;		//keeps track of the first element of the list
-	ListNode<T>* tail;		//keeps traks of the last element in the list
-	unsigned int length;	//length of the list
-
-};
 #endif
