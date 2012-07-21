@@ -1,8 +1,3 @@
-/*	Zakaria Soliman ID:5816734
-*		Assignment 1
-*/
-
-
 #ifndef LINKEDLIST_H
 #define	LINKEDLIST_H
 #include<iostream>

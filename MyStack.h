@@ -1,10 +1,3 @@
-/*	Zakaria Soliman ID:5816734
-*	This stack is implemented by using my implementation of a singly linked list.
-*
-*	The head of the list will be used as the top and as we push elements on the stack the previous element that was the head of the list will
-*	become second and so on.
-*
-*/
 #pragma once
 #include"LinkedList.h"
 

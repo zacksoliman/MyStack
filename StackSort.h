@@ -1,7 +1,3 @@
-/*	Zakaria Soliman ID:5816734
-*		Assignment 1
-*/
-
 #include "MyStack.h"
 
 template<typename T>
