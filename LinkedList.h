@@ -3,12 +3,6 @@
 #include<iostream>
 #include<iterator>
 
-
-/*	Zakaria Soliman ID:5816734
-*
-*
-*/
-
 //Forward declaration because I will use the list class in the node class.
 template<typename T> class LinkedList;
 

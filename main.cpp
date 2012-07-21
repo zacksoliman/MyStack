@@ -1,5 +1,3 @@
-
-
 /*	Zakaria Soliman ID:5816734
 *		Assignment 1
 */
@@ -8,6 +6,7 @@
 #include<iostream>
 #include<ctime>
 #include "MyStack.h"
+#include "timer.h"
 
 
 
@@ -32,13 +31,22 @@ int main (){
 
 	cout<<endl;
 
+	timer time;
+
+	time.StartTimer();
 	Sort(stack);
+	double elapsedTime = time.GetTime();
+
+	cout<<"The sorted stack: \n";
 
 	for(int i=0; i<n; ++i){
 		cout<<stack.peek()<<" ";
 		temp.push(stack.peek());
 		stack.pop();
 	}
+	cout<<endl;
+
+	cout<<"It took: "<<elapsedTime<<" miliseconds to sort.";
 	
 	system("PAUSE");
 
