@@ -1,7 +1,13 @@
+/*	Zakaria Soliman ID:5816734
+*		Assignment 1
+*/
+
+
 #ifndef LINKEDLIST_H
 #define	LINKEDLIST_H
 #include<iostream>
 #include<iterator>
+
 
 //Forward declaration because I will use the list class in the node class.
 template<typename T> class LinkedList;
@@ -84,100 +90,17 @@ public:
 
 };
 
-//Merge function that the merge sort algorithm will use to merge two linked lists
-template<typename T>
-LinkedList<T> Merge(LinkedList<T> left, LinkedList<T> right )
-{
-	LinkedList<T>::ListIterator leftIt = left.begin();
-	LinkedList<T>::ListIterator rightIt = right.begin();
-	LinkedList<T> sortedList;
-
-	while (!left.IsEmpty() && !right.IsEmpty()){
-		
-		if(*leftIt >= *rightIt){
-
-			sortedList.PushBack(*rightIt);
-			right.DeleteHead();
-			rightIt = right.begin();
-
-		}else if (*leftIt <= *rightIt){
-
-			sortedList.PushBack(*leftIt);
-			left.DeleteHead();
-			leftIt = left.begin();
-		}
-	}
-
-	if(left.IsEmpty()){
-
-		while(!right.IsEmpty()){
-
-			sortedList.PushBack(*rightIt);
-			right.DeleteHead();
-			rightIt = right.begin();
-		}
-
-	}else if(right.IsEmpty()){
-
-		while(!left.IsEmpty()){
-
-			sortedList.PushBack(*leftIt);
-			left.DeleteHead();
-			leftIt = left.begin();
-		}
-	}
-
-	
-	return sortedList;
-}
-
-//The MergeSort function recusivly partitions the linked lists and then merges them by calling the merge() function
-template<typename T>
-LinkedList<T> MergeSort (LinkedList<T> list)
-{
-	if (list.GetLength() == 1)
-		return list;
-	
-	LinkedList<T> left, right, sorted;
-	LinkedList<T>::ListIterator it = list.begin();
-
-	unsigned int midPoint = list.GetLength()/2;	//if length is odd, midPoint will be the floor of the division
-
-	for(unsigned int i=0; i < midPoint; ++i){
-	
-		left.PushBack(*it);
-		list.DeleteHead();
-		it = list.begin();
-	}
-
-
-	while (list.GetLength() != 0){
-
-		right.PushBack(*it);
-		list.DeleteHead();
-		it = list.begin();
-
-	}
-
-	left = MergeSort(left);
-    right = MergeSort(right);
-	
-	return Merge(left, right);
-
-}
-
-
 template<typename T>
 LinkedList<T>::LinkedList(void): length(0)
-	{
-		try{
-			head = new ListNode<T>;
-			tail = head;
-			tail->next = NULL;
-		}catch(bad_alloc& exc){
-			cerr<<"Memory allocation failed, cannot initialize the linked list.";
-		}
+{
+	try{
+		head = new ListNode<T>;
+		tail = head;
+		tail->next = NULL;
+	}catch(bad_alloc& exc){
+		cerr<<"Memory allocation failed, cannot initialize the linked list.";
 	}
+}
 
 template<typename T>
 void LinkedList<T>::Remove(const ListIterator& it)
