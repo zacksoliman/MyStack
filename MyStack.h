@@ -1,7 +1,7 @@
 #pragma once
 #include"LinkedList.h"
 
-/*
+/*	Zakaria Soliman ID:5816734
 *	This stack is implemented by using my implementation of a singly linked list.
 *
 *	The head of the list will be used as the top and as we push elements on the stack the previous element that was the head of the list will
@@ -13,7 +13,7 @@ template<typename T>
 class MyStack
 {
 public:
-	MyStack(void):top(stack.begin()), length(0) {};
+	MyStack(void):length(0) {};
 
 	//push an element on the stack, return false if it fails.
 	bool push(T elem);
@@ -28,42 +28,57 @@ public:
 
 private:
 	LinkedList<T> stack;
-	LinkedList<T>::ListIterator top;
 	unsigned int length;
 };
 
 template<typename T>
-bool MyStack::push(T elem) 
+bool MyStack<T>::push(T elem) 
 	{
-		if (stack.PushFront(elem)) 
-		{
-			return true;
-			++length;
-			top = stack.begin();
-		}
-		else 
-			return false;
-	}
+		++length;
+		return stack.PushFront(elem);
+	};
 
 template<typename T>
-void MyStack::pop(void)
+void MyStack<T>::pop(void)
 {
-	stack.DeleteHead(void);
-	top = stack.begin();
+	stack.DeleteHead();
 	--length;
-}
+};
 
 template<typename T>
-T MyStack::peek()
+T MyStack<T>::peek(void)
 {
-	return *top;
-}
+	return stack.FirstElement();
+};
 
 template<typename T>
-bool MyStack::IsEmpty()
+bool MyStack<T>::IsEmpty(void)
 {
 	if (length == 0)
 		return true;
 	else
-		retrun false;
+		return false;
+};
+
+template<typename T>
+void Sort(MyStack<T>& stack)
+{
+  MyStack<T> tempStack;
+  while (!stack.IsEmpty())
+  {
+	  int element = stack.peek();
+	  stack.pop();
+
+    while (!tempStack.IsEmpty() && tempStack.peek() < element)
+    {
+		stack.push(tempStack.peek());
+		tempStack.pop();
+    }
+	tempStack.push(element);
+  }
+  while (!tempStack.IsEmpty())
+  {
+	  stack.push(tempStack.peek());
+	  tempStack.pop();
+  }
 }
