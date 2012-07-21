@@ -1,6 +1,3 @@
-#pragma once
-#include"LinkedList.h"
-
 /*	Zakaria Soliman ID:5816734
 *	This stack is implemented by using my implementation of a singly linked list.
 *
@@ -8,6 +5,8 @@
 *	become second and so on.
 *
 */
+#pragma once
+#include"LinkedList.h"
 
 template<typename T>
 class MyStack

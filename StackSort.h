@@ -1,3 +1,7 @@
+/*	Zakaria Soliman ID:5816734
+*		Assignment 1
+*/
+
 #include "MyStack.h"
 
 template<typename T>
@@ -6,7 +10,7 @@ void Sort(MyStack<T>& stack)
   MyStack<T> tempStack;
   while (!stack.IsEmpty())
   {
-	  int element = stack.peek();
+	  T element = stack.peek();
 	  stack.pop();
 
     while (!tempStack.IsEmpty() && tempStack.peek() < element)
