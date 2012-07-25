@@ -3,7 +3,6 @@
 #include<iostream>
 #include<iterator>
 
-
 //Forward declaration because I will use the list class in the node class.
 template<typename T> class LinkedList;
 
@@ -53,6 +52,33 @@ public:
 	////*********END*********////
 	
 	LinkedList(void); //Constructor
+	//Copy constructor
+	LinkedList(const LinkedList& other)
+	{
+
+		ListNode<T> *current=NULL, *next=NULL;
+		if(other.head->next == NULL)
+			head->next = NULL;
+		else
+		{
+			current = head = new ListNode<T>;
+			next = other.head->next;
+
+			while (next)
+			{
+				current->next = new ListNode<T>;
+				current=current->next;
+				current->data = next->data;
+
+				next = next->next;
+			}
+		}
+
+		length = other.length;
+		tail = current;
+		current->next=NULL;
+
+	}
 	~LinkedList(void) {DeleteList(); delete head;}; //Destructor
 
 	//*** List Manipulation Methods ***//
@@ -76,26 +102,41 @@ public:
 
 	unsigned int GetLength(void) {return length;};
 	bool IsEmpty(void) { return (length == 0); };
-	T FirstElement(void) {return head->next->data;};
+	T FirstElement() {return head->next->data;};
 
 	//** Get relevant positions **//
 
 	ListIterator begin(void) {return ListIterator(head); };
 	ListIterator end(void) {return ListIterator(tail); };
 
+	LinkedList<T>& operator=(LinkedList<T>& rval){
+
+			if (this->head == rval.head) return *this;
+
+			LinkedList<T>::ListIterator it = rval.begin();
+			this->DeleteList();
+			while(it != rval.end()){
+			
+				this->PushBack(*it);
+				++it;
+			}
+
+			return *this;
+		};
 };
+
 
 template<typename T>
 LinkedList<T>::LinkedList(void): length(0)
-{
-	try{
-		head = new ListNode<T>;
-		tail = head;
-		tail->next = NULL;
-	}catch(bad_alloc& exc){
-		cerr<<"Memory allocation failed, cannot initialize the linked list.";
+	{
+		try{
+			head = new ListNode<T>;
+			tail = head;
+			tail->next = NULL;
+		}catch(bad_alloc& exc){
+			cerr<<"Memory allocation failed, cannot initialize the linked list.";
+		}
 	}
-}
 
 template<typename T>
 void LinkedList<T>::Remove(const ListIterator& it)
@@ -178,8 +219,16 @@ void LinkedList<T>::DeleteHead(void)
 template<typename T>
 void LinkedList<T>::DeleteList(void)
 	{
+		ListNode<T>* temp;
+
 		while(head->next != NULL)
-			DeleteHead();
+		{
+			temp = head;
+			head=head->next;
+			delete temp;
+			--length;
+		}
+			
 	}
 
 template<typename T>
